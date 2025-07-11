@@ -29,6 +29,17 @@
    )
    ```
 
+## 管理员角色字段
+1. 进入 MongoDB shell：`mongo`
+2. 切换数据库：`use dts`
+3. 为现有 `users` 文档添加 `role` 字段并设为 `user`：
+   ```javascript
+   db.users.updateMany(
+     { role: { $exists: false } },
+     { $set: { role: 'user' } }
+   )
+   ```
+
 ## 游戏信息集合
 1. 进入 MongoDB shell：`mongo`
 2. 切换数据库：`use dts`

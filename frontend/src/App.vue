@@ -1,19 +1,11 @@
 <script setup>
 import { computed } from 'vue'
-import { user, token } from './store/user'
+import { token } from './store/user'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const loggedIn = computed(() => !!token.value)
-
-function logout() {
-  user.value = ''
-  token.value = ''
-  localStorage.removeItem('user')
-  localStorage.removeItem('token')
-  router.push('/')
-}
 </script>
 
 
@@ -32,7 +24,6 @@ function logout() {
       <el-menu-item index="ranking" @click="router.push('/ranking')">玩家排行</el-menu-item>
       <el-menu-item index="help" @click="router.push('/help')">游戏帮助</el-menu-item>
       <el-menu-item index="admin" @click="router.push('/admin')">游戏管理</el-menu-item>
-      <el-menu-item v-if="loggedIn" index="logout" @click="logout">退出登录</el-menu-item>
     </el-menu>
     <router-view />
   </div>

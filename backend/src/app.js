@@ -16,7 +16,9 @@ mongoose.connect(mongoUri)
   .catch(err => console.error('MongoDB 连接失败', err));
 
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
-redisClient.connect().then(() => console.log('Redis 已连接'));
+redisClient.connect()
+  .then(() => console.log('Redis 已连接'))
+  .catch(err => console.error('Redis 连接失败', err));
 
 app.get('/api/ping', (req, res) => res.json({ msg: 'pong' }));
 app.use('/api/auth', authRoutes);

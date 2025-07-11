@@ -63,3 +63,29 @@
      gamevars: ''
    })
    ```
+
+## 游戏核心集合
+1. 创建 `players` 集合并建立索引：
+   ```javascript
+   db.players.createIndex({ pid: 1 })
+   db.players.createIndex({ type: 1 })
+   db.players.createIndex({ name: 1 })
+   db.players.createIndex({ pls: 1 })
+   ```
+2. 创建 `shopitems` 集合：
+   ```javascript
+   db.shopitems.createIndex({ sid: 1 })
+   db.shopitems.createIndex({ kind: 1, area: 1 })
+   ```
+3. 创建 `logs`、`chats`、`mapitems`、`maptraps`、`newsinfos`、`roomlisteners`、`histories` 集合：
+   ```javascript
+   db.logs.createIndex({ lid: 1 })
+   db.chats.createIndex({ cid: 1 })
+   db.mapitems.createIndex({ iid: 1 })
+   db.maptraps.createIndex({ tid: 1 })
+   db.newsinfos.createIndex({ nid: 1 })
+   db.roomlisteners.createIndex({ port: 1 })
+   db.histories.createIndex({ gid: 1 })
+   ```
+
+上述集合结构请参考 `backend/src/models` 中的同名模型文件。

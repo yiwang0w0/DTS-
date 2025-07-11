@@ -1,30 +1,42 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const user = ref(localStorage.getItem('user') || '')
+
+const loggedIn = computed(() => !!user.value)
+
+function logout() {
+  user.value = ''
+  localStorage.removeItem('user')
+  router.push('/')
+}
 </script>
 
 <template>
   <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+    <el-menu mode="horizontal" class="nav">
+      <el-menu-item index="home" @click="router.push('/')">首页</el-menu-item>
+      <el-menu-item index="mail" @click="router.push('/mail')">站内邮件</el-menu-item>
+      <el-menu-item index="profile" @click="router.push('/profile')">帐号资料</el-menu-item>
+      <el-menu-item v-if="!loggedIn" index="game" @click="router.push('/')">进入游戏</el-menu-item>
+      <el-menu-item v-else index="game" @click="router.push('/game')">进入游戏</el-menu-item>
+      <el-menu-item index="map" @click="router.push('/map')">战场地图</el-menu-item>
+      <el-menu-item index="status" @click="router.push('/status')">进行状况</el-menu-item>
+      <el-menu-item index="alive" @click="router.push('/alive')">当前幸存</el-menu-item>
+      <el-menu-item index="victory" @click="router.push('/victory')">历史优胜</el-menu-item>
+      <el-menu-item index="ranking" @click="router.push('/ranking')">玩家排行</el-menu-item>
+      <el-menu-item index="help" @click="router.push('/help')">游戏帮助</el-menu-item>
+      <el-menu-item index="admin" @click="router.push('/admin')">游戏管理</el-menu-item>
+      <el-menu-item v-if="loggedIn" index="logout" @click="logout">退出登录</el-menu-item>
+    </el-menu>
+    <router-view />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.nav {
+  user-select: none;
 }
 </style>

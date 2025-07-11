@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/game');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,7 @@ redisClient.connect().then(() => console.log('Redis 已连接'));
 app.get('/api/ping', (req, res) => res.json({ msg: 'pong' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/game', gameRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`后端服务已启动，端口：${process.env.PORT}`);

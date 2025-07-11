@@ -25,13 +25,30 @@
    ```javascript
    db.gameinfos.insertOne({
      version: '1.0',
-     gamestate: 'inactive',
-     startTime: new Date(),
-     areaInterval: 0,
-     areaAdd: 0,
-     areaNum: 0,
-     aliveCount: 0,
-     survivorCount: 0,
-     deathCount: 0
+     gamenum: 0,
+     gametype: 0,
+     gamestate: 0,
+     groomid: 0,
+     groomtype: 0,
+     groomstatus: 0,
+     starttime: 0,
+     afktime: 0,
+     validnum: 0,
+     alivenum: 0,
+     deathnum: 0,
+     combonum: 0,
+     weather: 0,
+     hack: 0,
+     hdamage: 0,
+     hplayer: '',
+     winmode: 0,
+     winner: '',
+     areanum: 0,
+     areatime: 0,
+     areawarn: 0,
+     arealist: '',
+     noisevars: '',
+     roomvars: '',
+     gamevars: ''
    })
    ```

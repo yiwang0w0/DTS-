@@ -1,6 +1,19 @@
 <template>
   <div class="page">
     <h2>欢迎来到 DTS</h2>
+    <div v-if="gameInfo" class="game-info">
+      <p>游戏版本：{{ gameInfo.version }}</p>
+      <p>当前时刻：{{ formatTime(gameInfo.now) }}</p>
+      <p>游戏情报：第 {{ gameInfo.gamenum }} 回游戏 {{ gameInfo.active ? '开放激活' : '关闭激活' }}</p>
+      <p>本局已进行时间：{{ gameInfo.runtime }}</p>
+      <p>上局结果：{{ gameInfo.last_result }}</p>
+      <p>禁区数据：{{ gameInfo.area }}</p>
+      <p>激活人数：{{ gameInfo.validnum }}</p>
+      <p>生存人数：{{ gameInfo.alivenum }}</p>
+      <p>死亡总数：{{ gameInfo.deathnum }}</p>
+      <el-button size="small" type="primary" @click="manualStart">手动开始游戏</el-button>
+      <el-button size="small" type="danger" @click="manualStop" style="margin-left: 8px">手动关闭游戏</el-button>
+    </div>
     <div v-if="!loggedIn" class="auth-box">
       <el-tabs v-model="activeTab" stretch>
         <el-tab-pane label="登录" name="login">
@@ -39,15 +52,56 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
-import { login as loginApi, register as registerApi } from '../api'
+import { reactive, ref, computed, onMounted } from 'vue'
+import {
+  login as loginApi,
+  register as registerApi,
+  getGameInfo,
+  startGame,
+  stopGame,
+} from '../api'
 import { user, token } from '../store/user'
+
+const gameInfo = ref(null)
 
 const loginForm = reactive({ username: '', password: '' })
 const registerForm = reactive({ username: '', password: '' })
 const activeTab = ref('login')
 
 const loggedIn = computed(() => !!token.value)
+
+function formatTime(t) {
+  return new Date(t).toLocaleString()
+}
+
+async function fetchGameInfo() {
+  try {
+    const { data } = await getGameInfo()
+    gameInfo.value = data
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+onMounted(fetchGameInfo)
+
+async function manualStart() {
+  try {
+    await startGame()
+    fetchGameInfo()
+  } catch (e) {
+    alert(e.response?.data?.msg || '操作失败')
+  }
+}
+
+async function manualStop() {
+  try {
+    await stopGame()
+    fetchGameInfo()
+  } catch (e) {
+    alert(e.response?.data?.msg || '操作失败')
+  }
+}
 
 async function login() {
   if (!loginForm.username || !loginForm.password) return
@@ -87,4 +141,5 @@ function logout() {
 .page { padding: 20px; }
 .auth-box { max-width: 400px; margin: 0 auto; }
 .welcome { margin-top: 20px; }
+.game-info { margin-bottom: 20px; }
 </style>

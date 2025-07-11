@@ -35,8 +35,3 @@ function logout() {
   </div>
 </template>
 
-<style scoped>
-.nav {
-  user-select: none;
-}
-</style>

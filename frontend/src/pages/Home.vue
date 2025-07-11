@@ -1,21 +1,22 @@
 <template>
   <div class="page">
     <h2>欢迎来到 DTS</h2>
-    <div class="game-info">
-      <p>游戏版本：{{ gameInfo.version ?? '未知' }}</p>
-      <p>当前时刻：{{ formatTime(Date.now()) }}</p>
-      <p>状态：{{ gameStatus }}</p>
-      <p>已运行：{{ runtime }}</p>
-      <p>禁区数：{{ gameInfo.areanum ?? '无法获取' }}</p>
-      <p>存活玩家：{{ gameInfo.alivenum ?? '无法获取' }}</p>
-      <p>死亡总数：{{ gameInfo.deathnum ?? '无法获取' }}</p>
-      <el-button size="small" type="primary" @click="manualStart">手动开始游戏</el-button>
-      <el-button size="small" type="danger" @click="manualStop" style="margin-left: 8px">手动关闭游戏</el-button>
-    </div>
-    <div v-if="!loggedIn" class="auth-box">
-      <el-tabs v-model="activeTab" stretch>
-        <el-tab-pane label="登录" name="login">
-          <el-form @submit.prevent="login">
+    <div class="home-container">
+      <div class="game-info">
+        <p>游戏版本：{{ gameInfo.version ?? '未知' }}</p>
+        <p>当前时刻：{{ formatTime(currentTime) }}</p>
+        <p>状态：{{ gameStatus }}</p>
+        <p>已运行：{{ runtime }}</p>
+        <p>禁区数：{{ gameInfo.areanum ?? '无法获取' }}</p>
+        <p>存活玩家：{{ gameInfo.alivenum ?? '无法获取' }}</p>
+        <p>死亡总数：{{ gameInfo.deathnum ?? '无法获取' }}</p>
+        <el-button size="small" type="primary" @click="manualStart">手动开始游戏</el-button>
+        <el-button size="small" type="danger" @click="manualStop" style="margin-left: 8px">手动关闭游戏</el-button>
+      </div>
+      <div v-if="!loggedIn" class="auth-box">
+        <el-tabs v-model="activeTab" stretch>
+          <el-tab-pane label="登录" name="login">
+            <el-form @submit.prevent="login">
             <el-form-item label="用户名">
               <el-input v-model="loginForm.username" autocomplete="off" />
             </el-form-item>
@@ -40,17 +41,18 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-      </el-tabs>
-    </div>
-    <div v-else class="welcome">
-      <p>已登录：{{ user }}</p>
-      <el-button type="primary" @click="logout">退出登录</el-button>
+        </el-tabs>
+      </div>
+      <div v-else class="welcome">
+        <p>已登录：{{ user }}</p>
+        <el-button type="primary" @click="logout">退出登录</el-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import {
   login as loginApi,
   register as registerApi,
@@ -61,6 +63,7 @@ import {
 import { user, token } from '../store/user'
 
 const gameInfo = ref({})
+const currentTime = ref(Date.now())
 
 const loginForm = reactive({ username: '', password: '' })
 const registerForm = reactive({ username: '', password: '' })
@@ -96,7 +99,20 @@ async function fetchGameInfo() {
   }
 }
 
-onMounted(fetchGameInfo)
+let timeTimer
+let infoTimer
+onMounted(() => {
+  fetchGameInfo()
+  timeTimer = setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+  infoTimer = setInterval(fetchGameInfo, 5000)
+})
+
+onUnmounted(() => {
+  clearInterval(timeTimer)
+  clearInterval(infoTimer)
+})
 
 async function manualStart() {
   try {
@@ -152,7 +168,25 @@ function logout() {
 
 <style scoped>
 .page { padding: 20px; }
-.auth-box { max-width: 400px; margin: 0 auto; }
-.welcome { margin-top: 20px; }
-.game-info { margin-bottom: 20px; }
+.home-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.auth-box {
+  max-width: 400px;
+  margin: 0 auto;
+}
+.welcome {
+  margin-top: 20px;
+}
+.game-info {
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+  .home-container {
+    flex-direction: column;
+  }
+}
 </style>

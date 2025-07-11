@@ -1,14 +1,14 @@
 <template>
   <div class="page">
     <h2>欢迎来到 DTS</h2>
-    <div v-if="gameInfo" class="game-info">
-      <p>游戏版本：{{ gameInfo.version }}</p>
+    <div class="game-info">
+      <p>游戏版本：{{ gameInfo.version ?? '未知' }}</p>
       <p>当前时刻：{{ formatTime(Date.now()) }}</p>
       <p>状态：{{ gameStatus }}</p>
       <p>已运行：{{ runtime }}</p>
-      <p>禁区数：{{ gameInfo.areaNum }}</p>
-      <p>存活玩家：{{ gameInfo.survivorCount }}</p>
-      <p>死亡总数：{{ gameInfo.deathCount }}</p>
+      <p>禁区数：{{ gameInfo.areanum ?? '无法获取' }}</p>
+      <p>存活玩家：{{ gameInfo.alivenum ?? '无法获取' }}</p>
+      <p>死亡总数：{{ gameInfo.deathnum ?? '无法获取' }}</p>
       <el-button size="small" type="primary" @click="manualStart">手动开始游戏</el-button>
       <el-button size="small" type="danger" @click="manualStop" style="margin-left: 8px">手动关闭游戏</el-button>
     </div>
@@ -60,7 +60,7 @@ import {
 } from '../api'
 import { user, token } from '../store/user'
 
-const gameInfo = ref(null)
+const gameInfo = ref({})
 
 const loginForm = reactive({ username: '', password: '' })
 const registerForm = reactive({ username: '', password: '' })
@@ -73,13 +73,13 @@ function formatTime(t) {
 }
 
 const gameStatus = computed(() => {
-  if (!gameInfo.value) return '未知'
-  return gameInfo.value.gamestate === 'active' ? '进行中' : '未开始'
+  if (!Object.keys(gameInfo.value).length) return '无法获取'
+  return gameInfo.value.gamestate > 10 ? '进行中' : '未开始'
 })
 
 const runtime = computed(() => {
-  if (!gameInfo.value?.startTime) return 'N/A'
-  const diff = Date.now() - new Date(gameInfo.value.startTime).getTime()
+  if (!gameInfo.value?.starttime) return 'N/A'
+  const diff = Date.now() - gameInfo.value.starttime * 1000
   const h = Math.floor(diff / 3600000)
   const m = Math.floor((diff % 3600000) / 60000)
   const s = Math.floor((diff % 60000) / 1000)
@@ -92,6 +92,7 @@ async function fetchGameInfo() {
     gameInfo.value = data || {}
   } catch (e) {
     console.error(e)
+    gameInfo.value = {}
   }
 }
 

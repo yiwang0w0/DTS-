@@ -1,18 +1,21 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { user, token } from './store/user'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const user = ref(localStorage.getItem('user') || '')
 
-const loggedIn = computed(() => !!user.value)
+const loggedIn = computed(() => !!token.value)
 
 function logout() {
   user.value = ''
+  token.value = ''
   localStorage.removeItem('user')
+  localStorage.removeItem('token')
   router.push('/')
 }
 </script>
+
 
 <template>
   <div>

@@ -41,23 +41,22 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import { login as loginApi, register as registerApi } from '../api'
+import { user, token } from '../store/user'
 
 const loginForm = reactive({ username: '', password: '' })
 const registerForm = reactive({ username: '', password: '' })
-const user = ref(localStorage.getItem('user') || '')
 const activeTab = ref('login')
 
-const loggedIn = computed(() => !!localStorage.getItem('token'))
+const loggedIn = computed(() => !!token.value)
 
 async function login() {
   if (!loginForm.username || !loginForm.password) return
   try {
     const { data } = await loginApi(loginForm.username, loginForm.password)
     user.value = data.username
+    token.value = data.token
     localStorage.setItem('user', user.value)
-    localStorage.setItem('token', data.token)
-    // 登录成功后刷新页面以更新状态
-    window.location.reload()
+    localStorage.setItem('token', token.value)
   } catch (e) {
     alert(e.response?.data?.msg || '登录失败')
   }
@@ -68,10 +67,9 @@ async function register() {
   try {
     const { data } = await registerApi(registerForm.username, registerForm.password)
     user.value = data.username
+    token.value = data.token
     localStorage.setItem('user', user.value)
-    localStorage.setItem('token', data.token)
-    // 注册成功后刷新页面以更新状态
-    window.location.reload()
+    localStorage.setItem('token', token.value)
   } catch (e) {
     alert(e.response?.data?.msg || '注册失败')
   }
@@ -79,6 +77,7 @@ async function register() {
 
 function logout() {
   user.value = ''
+  token.value = ''
   localStorage.removeItem('user')
   localStorage.removeItem('token')
 }

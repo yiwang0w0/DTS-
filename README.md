@@ -175,6 +175,41 @@ npm run build    # 打包生产环境
 npm run lint     # 代码规范检查
 ```
 
+## 游戏控制 API
+
+- **GET `/api/game/info`**：返回当前游戏状态及统计信息，示例：
+
+  ```json
+  {
+    "version": "1.0",
+    "gamestate": "active",
+    "startTime": "2024-01-01T00:00:00.000Z",
+    "areaInterval": 0,
+    "areaAdd": 0,
+    "areaNum": 0,
+    "aliveCount": 0,
+    "survivorCount": 0,
+    "deathCount": 0
+  }
+  ```
+
+- **POST `/api/game/start`**：将 `gamestate` 设为 `active`，成功返回：
+
+  ```json
+  { "msg": "游戏已开始", "gamestate": "active" }
+  ```
+
+- **POST `/api/game/stop`**：将 `gamestate` 设为 `inactive`，成功返回：
+
+  ```json
+  { "msg": "游戏已停止", "gamestate": "inactive" }
+  ```
+
+### 手动游戏控制按钮
+
+首页游戏信息区域提供“手动开始游戏”和“手动关闭游戏”两个按钮，
+分别调用上述 `/api/game/start` 与 `/api/game/stop` 接口，操作成功后自动刷新状态，可用于调试或管理员手动控制游戏进度。
+
 ---
 
 ## 参考/致谢

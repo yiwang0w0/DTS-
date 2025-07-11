@@ -4,6 +4,8 @@ const redis = require('redis');
 const cors = require('cors');
 require('dotenv').config();
 
+const authRoutes = require('./routes/auth');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -17,6 +19,7 @@ const redisClient = redis.createClient({ url: process.env.REDIS_URL });
 redisClient.connect().then(() => console.log('Redis 已连接'));
 
 app.get('/api/ping', (req, res) => res.json({ msg: 'pong' }));
+app.use('/api/auth', authRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`后端服务已启动，端口：${process.env.PORT}`);

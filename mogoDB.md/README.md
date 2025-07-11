@@ -18,6 +18,17 @@
 
 如果后续还有无法在代码中完成的数据库操作，请在此目录补充说明。
 
+## 刷新令牌字段
+1. 进入 MongoDB shell：`mongo`
+2. 切换数据库：`use dts`
+3. 为现有 `users` 文档添加 `refreshToken` 字段：
+   ```javascript
+   db.users.updateMany(
+     { refreshToken: { $exists: false } },
+     { $set: { refreshToken: '' } }
+   )
+   ```
+
 ## 游戏信息集合
 1. 进入 MongoDB shell：`mongo`
 2. 切换数据库：`use dts`

@@ -74,6 +74,9 @@ cd dts-sample-mongo-vue
     MONGODB_URI=mongodb://localhost:27017/dts
     REDIS_URL=redis://localhost:6379
     JWT_SECRET=your_secret
+    JWT_REFRESH_SECRET=your_refresh_secret
+    JWT_ACCESS_EXPIRES=1h
+    JWT_REFRESH_EXPIRES=7d
     ```
 
 - **启动 MongoDB、Redis 服务**
@@ -208,6 +211,13 @@ npm run lint     # 代码规范检查
 
 首页游戏信息区域提供“手动开始游戏”和“手动关闭游戏”两个按钮，
 分别调用上述 `/api/game/start` 与 `/api/game/stop` 接口，操作成功后自动刷新状态，可用于调试或管理员手动控制游戏进度。
+
+## 认证 API
+
+- **POST `/api/auth/login`**：登录并返回 `token` 与 `refreshToken`
+- **POST `/api/auth/register`**：注册并返回 `token` 与 `refreshToken`
+- **POST `/api/auth/refresh`**：使用 `refreshToken` 获取新的 `token`
+- **POST `/api/auth/logout`**：注销并清除服务器端的 `refreshToken`
 
 ---
 

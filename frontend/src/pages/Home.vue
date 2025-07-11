@@ -57,8 +57,9 @@ import {
   getGameInfo,
   startGame,
   stopGame,
+  logout as logoutApi,
 } from '../api'
-import { user, token } from '../store/user'
+import { user, token, refreshToken } from '../store/user'
 
 const gameInfo = ref({})
 
@@ -122,8 +123,10 @@ async function login() {
     const { data } = await loginApi(loginForm.username, loginForm.password)
     user.value = data.username
     token.value = data.token
+    refreshToken.value = data.refreshToken
     localStorage.setItem('user', user.value)
     localStorage.setItem('token', token.value)
+    localStorage.setItem('refreshToken', refreshToken.value)
   } catch (e) {
     alert(e.response?.data?.msg || '登录失败')
   }
@@ -135,18 +138,28 @@ async function register() {
     const { data } = await registerApi(registerForm.username, registerForm.password)
     user.value = data.username
     token.value = data.token
+    refreshToken.value = data.refreshToken
     localStorage.setItem('user', user.value)
     localStorage.setItem('token', token.value)
+    localStorage.setItem('refreshToken', refreshToken.value)
   } catch (e) {
     alert(e.response?.data?.msg || '注册失败')
   }
 }
 
-function logout() {
+async function logout() {
+  try {
+    if (refreshToken.value)
+      await logoutApi(refreshToken.value)
+  } catch (e) {
+    // ignore
+  }
   user.value = ''
   token.value = ''
+  refreshToken.value = ''
   localStorage.removeItem('user')
   localStorage.removeItem('token')
+  localStorage.removeItem('refreshToken')
 }
 </script>
 

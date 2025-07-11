@@ -110,9 +110,27 @@ cd dts-sample-mongo-vue
 
 - **启动前端服务**
   ```bash
-  npm run dev
-  # 默认监听 5173 端口
-  ```
+npm run dev
+# 默认监听 5173 端口
+```
+
+### 4. 数据初始化
+
+项目根目录 `data` 目录内提供了原作同款的 `gameinfo.json` 与 `shopitems.json` 数据文件，可直接导入 MongoDB：
+
+```bash
+cd mogoDB.md
+mongoimport --db dts --collection gameinfos --file ../data/gameinfo.json --jsonArray
+mongoimport --db dts --collection shopitems --file ../data/shopitems.json --jsonArray
+```
+
+也可以在 `mongo` shell 中执行 `data/initData.js` 脚本一次完成导入：
+
+```bash
+mongo ../data/initData.js
+```
+
+导入完成后即可获得与原作一致的基础游戏信息及商店物品。
 
 ---
 

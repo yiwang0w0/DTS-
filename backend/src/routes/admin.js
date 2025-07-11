@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth');
 const checkAdmin = require('../middlewares/admin');
+const fieldsMeta = require('../fieldsMeta');
 
 const models = {
   players: require('../models/Player'),
@@ -23,6 +24,11 @@ router.use(checkAdmin);
 function getModel(name) {
   return models[name];
 }
+
+router.get('/:collection/fieldmeta', (req, res) => {
+  const meta = fieldsMeta[req.params.collection] || [];
+  res.json(meta);
+});
 
 router.get('/:collection', async (req, res) => {
   const Model = getModel(req.params.collection);

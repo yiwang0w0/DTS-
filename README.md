@@ -183,13 +183,12 @@ npm run lint     # 代码规范检查
   {
     "version": "1.0",
     "gamestate": "active",
-    "startTime": "2024-01-01T00:00:00.000Z",
+    "starttime": 0,
     "areaInterval": 0,
     "areaAdd": 0,
-    "areaNum": 0,
-    "aliveCount": 0,
-    "survivorCount": 0,
-    "deathCount": 0
+    "areanum": 0,
+    "alivenum": 0,
+    "deathnum": 0
   }
   ```
 

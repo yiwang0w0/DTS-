@@ -7,28 +7,46 @@
     <el-button type="primary" size="small" @click="openCreate" style="margin-left:10px">新建</el-button>
     <el-table :data="items" style="margin-top: 20px" row-key="_id">
       <el-table-column prop="_id" label="ID" width="230" />
-      <el-table-column label="数据">
+      <el-table-column v-for="f in fieldMeta" :key="f.name" :prop="f.name" :label="f.label">
         <template #default="{ row }">
-          <pre>{{ json(row) }}</pre>
+          <span>{{ row[f.name] }}</span>
+          <el-button size="small" text @click="openFieldEdit(row, f)">编辑</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="120">
         <template #default="{ row }">
-          <el-button size="small" @click="openEdit(row)">编辑</el-button>
           <el-button size="small" type="danger" @click="remove(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog v-model="dialogVisible" title="编辑" width="600px">
-      <el-input
-        type="textarea"
-        v-model="editData"
-        :rows="10"
-        style="font-family: monospace"
-      />
+    <el-dialog v-model="fieldDialogVisible" :title="'编辑 '+(editField?.label||'')" width="300px">
+      <template v-if="editField">
+        <el-input v-if="editField.type==='text'" v-model="editValue" />
+        <el-input-number v-else-if="editField.type==='number'" v-model="editValue" />
+        <el-select v-else-if="editField.type==='select'" v-model="editValue">
+          <el-option v-for="op in editField.options" :key="op" :label="op" :value="op" />
+        </el-select>
+        <el-input v-else v-model="editValue" />
+      </template>
       <template #footer>
-        <el-button @click="dialogVisible=false">取消</el-button>
-        <el-button type="primary" @click="saveEdit">保存</el-button>
+        <el-button @click="fieldDialogVisible=false">取消</el-button>
+        <el-button type="primary" @click="saveField">保存</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="createDialogVisible" title="新建" width="600px">
+      <el-form label-width="80px">
+        <el-form-item v-for="f in fieldMeta" :key="f.name" :label="f.label">
+          <el-input v-if="f.type==='text'" v-model="createData[f.name]" />
+          <el-input-number v-else-if="f.type==='number'" v-model="createData[f.name]" />
+          <el-select v-else-if="f.type==='select'" v-model="createData[f.name]">
+            <el-option v-for="op in f.options" :key="op" :label="op" :value="op" />
+          </el-select>
+          <el-input v-else v-model="createData[f.name]" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="createDialogVisible=false">取消</el-button>
+        <el-button type="primary" @click="saveCreate">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -40,7 +58,8 @@ import {
   adminList,
   adminCreate,
   adminUpdate,
-  adminDelete
+  adminDelete,
+  adminFieldMeta
 } from '../api'
 
 const collections = [
@@ -58,15 +77,30 @@ const collections = [
 ]
 
 const collection = ref('')
+const fieldMeta = ref([])
 const items = ref([])
-const dialogVisible = ref(false)
-const editData = ref('')
-const editId = ref('')
 
-watch(collection, fetchItems)
+const fieldDialogVisible = ref(false)
+const editField = ref(null)
+const editRowId = ref('')
+const editValue = ref('')
 
-function json(obj) {
-  return JSON.stringify(obj, null, 2)
+const createDialogVisible = ref(false)
+const createData = ref({})
+
+watch(collection, () => {
+  fetchFieldMeta()
+  fetchItems()
+}, { immediate: true })
+
+async function fetchFieldMeta() {
+  if (!collection.value) return
+  try {
+    const { data } = await adminFieldMeta(collection.value)
+    fieldMeta.value = data
+  } catch (e) {
+    fieldMeta.value = []
+  }
 }
 
 async function fetchItems() {
@@ -79,33 +113,36 @@ async function fetchItems() {
   }
 }
 
-function openEdit(row) {
-  editId.value = row._id
-  editData.value = json(row)
-  dialogVisible.value = true
+function openFieldEdit(row, field) {
+  editRowId.value = row._id
+  editField.value = field
+  editValue.value = row[field.name]
+  fieldDialogVisible.value = true
+}
+
+async function saveField() {
+  const update = { [editField.value.name]: editValue.value }
+  try {
+    await adminUpdate(collection.value, editRowId.value, update)
+    fieldDialogVisible.value = false
+    fetchItems()
+  } catch (e) {
+    alert(e.response?.data?.msg || '保存失败')
+  }
 }
 
 function openCreate() {
-  editId.value = ''
-  editData.value = '{}'
-  dialogVisible.value = true
+  createData.value = {}
+  fieldMeta.value.forEach(f => {
+    createData.value[f.name] = f.type === 'number' ? 0 : ''
+  })
+  createDialogVisible.value = true
 }
 
-async function saveEdit() {
-  let dataObj
+async function saveCreate() {
   try {
-    dataObj = JSON.parse(editData.value)
-  } catch (e) {
-    alert('JSON格式错误')
-    return
-  }
-  try {
-    if (editId.value) {
-      await adminUpdate(collection.value, editId.value, dataObj)
-    } else {
-      await adminCreate(collection.value, dataObj)
-    }
-    dialogVisible.value = false
+    await adminCreate(collection.value, createData.value)
+    createDialogVisible.value = false
     fetchItems()
   } catch (e) {
     alert(e.response?.data?.msg || '保存失败')

@@ -56,6 +56,8 @@ async function login() {
     user.value = data.username
     localStorage.setItem('user', user.value)
     localStorage.setItem('token', data.token)
+    // 登录成功后刷新页面以更新状态
+    window.location.reload()
   } catch (e) {
     alert(e.response?.data?.msg || '登录失败')
   }
@@ -68,6 +70,8 @@ async function register() {
     user.value = data.username
     localStorage.setItem('user', user.value)
     localStorage.setItem('token', data.token)
+    // 注册成功后刷新页面以更新状态
+    window.location.reload()
   } catch (e) {
     alert(e.response?.data?.msg || '注册失败')
   }

@@ -7,6 +7,7 @@
     <el-button type="primary" size="small" @click="openCreate" style="margin-left:10px">新建</el-button>
     <el-table :data="items" style="margin-top: 20px" row-key="_id">
       <el-table-column prop="_id" label="ID" width="230" />
+      <el-table-column v-for="f in displayFields" :key="f" :prop="f" :label="f" />
       <el-table-column label="数据">
         <template #default="{ row }">
           <pre>{{ json(row) }}</pre>
@@ -35,12 +36,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import {
   adminList,
   adminCreate,
   adminUpdate,
-  adminDelete
+  adminDelete,
+  adminFields
 } from '../api'
 
 const collections = [
@@ -62,8 +64,15 @@ const items = ref([])
 const dialogVisible = ref(false)
 const editData = ref('')
 const editId = ref('')
+const fields = ref([])
 
-watch(collection, fetchItems)
+const displayFields = computed(() => fields.value.slice(0, 5))
+watch(collection, () => {
+  fetchItems()
+  fetchFields()
+})
+
+if (collections.length) collection.value = collections[0].value
 
 function json(obj) {
   return JSON.stringify(obj, null, 2)
@@ -76,6 +85,17 @@ async function fetchItems() {
     items.value = data
   } catch (e) {
     alert(e.response?.data?.msg || '加载失败')
+  }
+}
+
+async function fetchFields() {
+  if (!collection.value) return
+  try {
+    const { data } = await adminFields(collection.value)
+    fields.value = data
+  } catch (e) {
+    console.error(e)
+    fields.value = []
   }
 }
 

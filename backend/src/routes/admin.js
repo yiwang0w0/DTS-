@@ -24,6 +24,13 @@ function getModel(name) {
   return models[name];
 }
 
+router.get('/:collection/fields', (req, res) => {
+  const Model = getModel(req.params.collection);
+  if (!Model) return res.status(404).json({ msg: '集合不存在' });
+  const fields = Object.keys(Model.schema.paths).filter(k => k !== '__v');
+  res.json(fields);
+});
+
 router.get('/:collection', async (req, res) => {
   const Model = getModel(req.params.collection);
   if (!Model) return res.status(404).json({ msg: '集合不存在' });

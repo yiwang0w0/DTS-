@@ -32,5 +32,6 @@ export const adminList = col => api.get(`/admin/${col}`)
 export const adminCreate = (col, data) => api.post(`/admin/${col}`, data)
 export const adminUpdate = (col, id, data) => api.put(`/admin/${col}/${id}`, data)
 export const adminDelete = (col, id) => api.delete(`/admin/${col}/${id}`)
+export const adminFields = col => api.get(`/admin/${col}/fields`)
 
 export default api

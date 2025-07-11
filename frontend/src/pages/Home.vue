@@ -40,31 +40,43 @@
 
 <script setup>
 import { reactive, ref, computed } from 'vue'
+import { login as loginApi, register as registerApi } from '../api'
 
 const loginForm = reactive({ username: '', password: '' })
 const registerForm = reactive({ username: '', password: '' })
 const user = ref(localStorage.getItem('user') || '')
 const activeTab = ref('login')
 
-const loggedIn = computed(() => !!user.value)
+const loggedIn = computed(() => !!localStorage.getItem('token'))
 
-function login() {
-  if (loginForm.username) {
-    user.value = loginForm.username
+async function login() {
+  if (!loginForm.username || !loginForm.password) return
+  try {
+    const { data } = await loginApi(loginForm.username, loginForm.password)
+    user.value = data.username
     localStorage.setItem('user', user.value)
+    localStorage.setItem('token', data.token)
+  } catch (e) {
+    alert(e.response?.data?.msg || '登录失败')
   }
 }
 
-function register() {
-  if (registerForm.username) {
-    user.value = registerForm.username
+async function register() {
+  if (!registerForm.username || !registerForm.password) return
+  try {
+    const { data } = await registerApi(registerForm.username, registerForm.password)
+    user.value = data.username
     localStorage.setItem('user', user.value)
+    localStorage.setItem('token', data.token)
+  } catch (e) {
+    alert(e.response?.data?.msg || '注册失败')
   }
 }
 
 function logout() {
   user.value = ''
   localStorage.removeItem('user')
+  localStorage.removeItem('token')
 }
 </script>
 
